@@ -21,6 +21,14 @@ class WhisperUser {
     }
 
     saveUser() {
+        // Ensure directories exist before saving
+        if (!fs.existsSync('data')) {
+            fs.mkdirSync('data');
+        }
+        if (!fs.existsSync('data/users')) {
+            fs.mkdirSync('data/users');
+        }
+
         // Save the user's information for later
         const userData = JSON.stringify({
             serialNumber: this.serialNumber,
@@ -64,7 +72,7 @@ class WhisperUser {
 
         // Solve the first challenge
         let work = Crypto.generateWork(token, expected);
-        this.keyPair = Crypto.generateKeyPair(`data/keys/${token}`);
+        this.keyPair = Crypto.generateKeyPair();
         let nonce = Crypto.generateNonce();
         let params = {
             device_id: this.serialNumber,
@@ -118,7 +126,18 @@ class WhisperUser {
         console.log(`Verified user`);
         this.userData = response;
 
-        // TODO: Set a pin for the user
+        // Set the user's PIN
+        this.pin = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+        data = {
+            uid: this.uid,
+            pin: this.pin,
+            forced: true
+        }
+        params = {
+            uid: this.uid,
+            locale: 'en_us'
+        }
+        response = await apiClient('android', '/user/settings', 'post', params, null, data, this, false);
 
         // Get TigerText authentication stuff
         params = {

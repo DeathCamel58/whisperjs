@@ -36,7 +36,7 @@ function generateWork(token, expected) {
     return work;
 }
 
-function generateKeyPair(path) {
+function generateKeyPair() {
     console.log("Generating a key pair");
     const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 1024,
@@ -66,11 +66,6 @@ function generateKeyPair(path) {
             pem: h()+priBase64+h(0,1)
         }
     }
-
-    // Save keypair to file
-    fs.writeFileSync(`${path}.pem`, privateKey);
-    fs.writeFileSync(`${path}.pub`, publicKey);
-    console.log(`\tSaved to ${path}`);
 
     return keyPair;
 }
