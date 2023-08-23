@@ -19,7 +19,7 @@ class Messaging {
             locale: 'en_us',
             origin: 'other'
         };
-        let response = await apiClient('android', `/messaging/conversation/${wid}/${this.user.uid}`, 'get', params, null, null, this.user, false);
+        let response = await apiClient('android', `/messaging/conversation/${wid}/${this.user.uid}`, 'post', params, null, data, this.user, false);
         return response;
     }
 

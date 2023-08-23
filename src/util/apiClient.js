@@ -41,6 +41,14 @@ async function apiClient(
         'User-Agent': 'okhttp/4.9.1',
     }
 
+    if (customHeaders !== null) {
+        if (Object.keys(customHeaders).length !== 0) {
+            for (const key in customHeaders) {
+                headers[key] = customHeaders[key];
+            }
+        }
+    }
+
     if (user != null) {
         if (user.sessionToken != null) {
             headers['Session_token'] = user.sessionToken;
