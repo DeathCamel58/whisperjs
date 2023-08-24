@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class Messaging {
     constructor(user) {
@@ -11,16 +11,47 @@ class Messaging {
      * @returns {Promise<*>}
      */
     async conversation(wid) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                origin: 'nearby'
+            }
+        }
+
         let data = {
             uid: this.user.uid
         }
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us',
-            origin: 'other'
-        };
-        let response = await apiClient('android', `/messaging/conversation/${wid}/${this.user.uid}`, 'post', params, null, data, this.user, false);
-        return response;
+
+        let response = await axios.post(`https://prod-android.whisper.sh/messaging/conversation/${wid}/${this.user.uid}`, data, config);
+
+        return response.data;
+    }
+
+    /**
+     Gets conversation information by a group
+     * @param group_token The group_id to get
+     * @returns {Promise<*>}
+     */
+    async conversationByGroup(group_token) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid,
+                wid: wid
+            }
+        }
+
+        let response = await axios.get(`https://prod-android.whisper.sh/messaging/conversation/by_group/${group_token}`, config);
+
+        return response.data;
     }
 
     /**
@@ -29,13 +60,20 @@ class Messaging {
      * @returns {Promise<*>}
      */
     async conversationProfile(wid) {
-        let params = {
-            uid: this.user.uid,
-            wid: wid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/messaging/conversation/profile', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid,
+                wid: wid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/messaging/conversation/profile', config);
+
+        return response.data;
     }
 
     /**
@@ -43,28 +81,68 @@ class Messaging {
      * @returns {Promise<*>}
      */
     async conversationsTTAuth() {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/messaging/conversations/tt_auth', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/messaging/conversations/tt_auth', config);
+
+        return response.data;
     }
 
-    // TODO: Add conversations_v2
+    /**
+     * Gets the conversations
+     * @returns {Promise<*>}
+     */
+    async conversationsV2() {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/messaging/conversations_v2', config);
+
+        return response.data;
+    }
 
     /**
      * Gets the recommended Whispers
      * @returns {Promise<*>}
      */
     async recommendedWhispers() {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/messaging/recommended_whispers', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/messaging/recommended_whispers', config);
+
+        return response.data;
     }
+
+    // TODO: Add conversation/by_group/{GROUPTOKEN}
+    // TODO: Add conversation/profile_by_cid
+    // TODO: Add conversation/profile
+    // TODO: Add conversations/accept
+    // TODO: Add conversations/delete/
+    // TODO: Add conversations/tt_auth
+    // TODO: Add rate
 }
 
 module.exports = {
