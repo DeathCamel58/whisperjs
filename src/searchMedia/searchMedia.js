@@ -18,8 +18,7 @@ class SearchMedia {
         let config = {
             headers: {
                 Publisher_version: 'android_9.68.0',
-                Session_token: this.user.sessionToken,
-                'Content-Type': 'x-www-form-urlencoded'
+                Session_token: this.user.sessionToken
             },
             params: {
                 uid: this.user.uid,
