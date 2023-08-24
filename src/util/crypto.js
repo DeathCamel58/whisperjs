@@ -29,8 +29,21 @@ function generateHmac(nonce) {
 function generateWork(token, expected) {
     let work = token;
 
+    if (expected > 18) {
+        console.log(`generateWork: Long expected (${expected}). Will attempt to generate`);
+    }
+
+    let i = 0;
     while (countZeroes(getSha(work)) !== expected) {
-        work += crypto.randomBytes(4).toString('hex');
+        // Try up to 7000 characters
+        if (i < 7000) {
+            work += crypto.randomBytes(4).toString('hex');
+        } else {
+            // Retry if more than 7000 characters
+            work = token;
+            i = 0;
+        }
+        i++
     }
 
     return work;
