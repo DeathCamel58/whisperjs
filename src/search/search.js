@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class Search {
     constructor(user) {
@@ -13,16 +13,23 @@ class Search {
     async get(query) {
         let base64Query = (new Buffer(query).toString('base64'));
         console.log(`Base64 Encoding:\n\tQuery\t${query}\n\tBase64\t${base64Query}`);
-        let params = {
-            query_type: 'tribe,whisper',
-            uid: this.user.uid,
-            locale: 'en_us',
-            query: base64Query + '\n',
-            sme: true,
-            limit: 40
-        };
-        let response = await apiClient('android', '/search', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                query_type: 'tribe,whisper',
+                uid: this.user.uid,
+                query: base64Query + '\n',
+                sme: true,
+                limit: 40
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/search', config);
+
+        return response.data;
     }
 
     /**
@@ -31,14 +38,21 @@ class Search {
      * @returns {Promise<*>}
      */
     async suggest(query) {
-        let params = {
-            types: 'place',
-            uid: this.user.uid,
-            locale: 'en_us',
-            query: query
-        };
-        let response = await apiClient('android', '/search/suggest/', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                types: 'place',
+                query: query,
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/search/suggest/', config);
+
+        return response.data;
     }
 
     /**
@@ -47,13 +61,20 @@ class Search {
      * @returns {Promise<*>}
      */
     async autocomplete(query) {
-        let params = {
-            query: query,
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/search/suggest/autocomplete', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                query: query,
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/search/suggest/autocomplete', config);
+
+        return response.data;
     }
 }
 
