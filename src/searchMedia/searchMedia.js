@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class SearchMedia {
     constructor(user) {
@@ -14,15 +14,23 @@ class SearchMedia {
     async suggest(query, wid = null) {
         let base64Query = (new Buffer(query).toString('base64'));
         console.log(`Base64 Encoding:\n\tQuery\t${query}\n\tBase64\t${base64Query}`);
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us',
-            parent_wid: wid,
-            media_types: 'image',
-            query: base64Query + '\n'
-        };
-        let response = await apiClient('android', '/search_media', 'get', params, null, null, this.user, false);
-        return response;
+
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid,
+                parent_wid: wid,
+                media_types: 'image',
+                query: base64Query + '\n'
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/search_media', config);
+
+        return response.data;
     }
 }
 

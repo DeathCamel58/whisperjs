@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class Whisper {
     constructor(user) {
@@ -11,13 +11,20 @@ class Whisper {
      * @returns {Promise<*>}
      */
     async get(wid) {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us',
-            wid: wid
-        };
-        let response = await apiClient('android', `/whisper`, 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid,
+                wid: wid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whisper', config);
+
+        return response.data;
     }
 
     /**
@@ -36,6 +43,7 @@ class Whisper {
      * @param ts TODO: Document
      * @param new_crossed_paths TODO: Document
      * @param background_upload TODO: Document
+     * @param widToReply The Whisper ID to make this a reply to
      * @returns {Promise<*>}
      */
     async add(
@@ -55,6 +63,19 @@ class Whisper {
         background_upload = true,
         widToReply = null
     ) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'Application/json'
+            },
+            params: {
+                include_me2: false,
+                uid: this.user.uid,
+                type: 'top_level'
+            }
+        }
+
         let data = {
             "text": text,
             "is_client_rendered": is_client_rendered,
@@ -79,14 +100,10 @@ class Whisper {
             data['parent_wid'] = widToReply;
             data['in_reply_to'] = widToReply;
         }
-        let params = {
-            include_me2: false,
-            uid: this.user.uid,
-            type: 'top_level',
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/whisper/add', 'post', params, null, data, this.user, true);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/whisper/add', data, config);
+
+        return response.data;
     }
 
     /**
@@ -103,6 +120,17 @@ class Whisper {
         reason = 'other',
         sub_reason = 'dont_want_to_see_it'
     ) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             wid: wid,
@@ -110,12 +138,10 @@ class Whisper {
             reason: reason,
             sub_reason: sub_reason
         }
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/whisper/flag', 'post', params, null, data, this.user, false);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/whisper/flag', data, config);
+
+        return response.data;
     }
 
     /**
@@ -124,17 +150,26 @@ class Whisper {
      * @returns {Promise<*>}
      */
     async me2(wid) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             wid: wid,
             origin: 'other'
         }
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/whisper/me2', 'post', params, null, data, this.user, false);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/whisper/me2', data, config);
+
+        return response.data;
     }
 
     /**
@@ -143,14 +178,24 @@ class Whisper {
      * @returns {Promise<*>}
      */
     async shortened(wid) {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us',
-            wid: wid
-        };
-        let response = await apiClient('android', `/whisper/shortened/${wid}`, 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                wid: wid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whisper/shortened/' + wid, config);
+
+        return response.data;
     }
+
+    // TODO: Add related
 }
 
 module.exports = {

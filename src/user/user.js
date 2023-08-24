@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class User {
     constructor(user) {
@@ -10,12 +10,19 @@ class User {
      * @returns {Promise<*>}
      */
     async activity() {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/user/activity', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/user/activity', config);
+
+        return response.data;
     }
 
     /**
@@ -23,12 +30,19 @@ class User {
      * @returns {Promise<*>}
      */
     async feeds() {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/user/feeds', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/user/feeds', config);
+
+        return response.data;
     }
 
     /**
@@ -38,10 +52,17 @@ class User {
      * @returns {Promise<*>}
      */
     async location(latitude, longitude) {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/json'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             "payload": [
                 {
@@ -68,8 +89,10 @@ class User {
             ],
             "uid": this.user.uid
         };
-        let response = await apiClient('whisper', '/user/location', 'post', params, null, data, this.user, true);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/user/location', data, config);
+
+        return response.data;
     }
 
     /**
@@ -79,17 +102,26 @@ class User {
      * @returns {Promise<*>}
      */
     async pin(pin, forced) {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             pin: pin,
             forced: forced
         };
-        let response = await apiClient('whisper', '/user/pin', 'post', params, null, data, this, false);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/user/pin', data, config);
+
+        return response.data;
     }
 
     /**
@@ -122,10 +154,15 @@ class User {
         push_new_feed_post = null,
         push_reply = null
     ) {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
 
         let data = {};
         if (gender != null) {
@@ -167,11 +204,18 @@ class User {
         let response = null;
         if (Object.keys(data).length !== 0) {
             data['uid'] = this.user.uid;
-            response = await apiClient('android', '/user/settings', 'post', params, null, data, this.user, false);
+            config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            response = await axios.post('https://prod-android.whisper.sh/user/settings', data, config).catch(function (e) {
+                if (e.response.status === 409) {
+                    console.log(`Can\'t update user settings: ${e.response.data.errors[0].body}`);
+                    return(e.response);
+                }
+            });
         } else {
-            response = await apiClient('android', '/user/settings', 'get', params, null, null, this.user, false);
+            response = await axios.get('https://prod-android.whisper.sh/user/settings', config);
         }
-        return response;
+
+        return response.data;
     }
 
     /**
@@ -180,21 +224,79 @@ class User {
      * @returns {Promise<*>}
      */
     async update_nickname(nickname) {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             nickname: nickname
         };
-        let response = await apiClient('whisper', '/user/update_nickname', 'post', params, null, data, this.user, false);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/user/update_nickname', data, config);
+
+        return response.data;
     }
 
+    /**
+     * Check that the current user is valid
+     * @returns {Promise<*>}
+     */
+    async validate() {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/user/validate', config).catch(function (e) {
+            if (e.response.status === 403) {
+                console.log('Can\'t validate user');
+                return(e.response);
+            }
+        });
+
+        return response.data;
+    }
+
+    /**
+     * Gets current user's data
+     * @returns {Promise<*>}
+     */
+    async verify() {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                uid: this.user.uid,
+                sessions: 0
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/user/verify/' + this.user.uid, config)
+
+        return response.data;
+    }
+
+    // TODO: Add token (`registerPushTokenWithWhisper` in APK)
     // TODO: Add validate
-    // TODO: Add verify
     // TODO: Add create_places
+    // TODO: Add xp_hide
+    // TODO: Add significant_places
+    // TODO: Add migrate
 }
 
 module.exports = {

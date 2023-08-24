@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class Featured {
     constructor(user) {
@@ -10,12 +10,18 @@ class Featured {
      * @returns {Promise<*>}
      */
     async get() {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', `/featured/${this.user.uid}`, 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
+        let response = await axios.get(`https://prod-android.whisper.sh/featured/` + this.user.uid, config);
+
+        return response.data;
     }
 }
 

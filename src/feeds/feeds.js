@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class Feeds {
     constructor(user) {
@@ -27,6 +27,17 @@ class Feeds {
         crop_width = 640,
         crop_height = 228
     ) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/json'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             type: "tribe",
@@ -39,12 +50,15 @@ class Feeds {
             crop_height: crop_height,
             description: description
         }
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/feeds/create', 'post', params, null, data, this.user, true);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/feeds/create', data, config).catch(function (e) {
+            if (e.response.status === 403) {
+                console.log(`Can\'t create feed: ${e.response.data.errors[0]}`);
+                return(e.response);
+            }
+        });
+
+        return response.data;
     }
 
     /**
@@ -53,16 +67,25 @@ class Feeds {
      * @returns {Promise<*>}
      */
     async subscribe(feed_id) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             feed_id: feed_id
         }
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/feeds/subscribe', 'post', params, null, data, this.user, false);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/feeds/subscribe', data, config);
+
+        return response.data;
     }
 
     /**
@@ -71,14 +94,21 @@ class Feeds {
      * @returns {Promise<*>}
      */
     async subscribers(feed_id) {
-        let params = {
-            feed_id: feed_id,
-            uid: this.user.uid,
-            locale: 'en_us',
-            limit: 40
-        };
-        let response = await apiClient('android', '/search/subscribers', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                feed_id: feed_id,
+                uid: this.user.uid,
+                limit: 40
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/feeds/subscribers', config);
+
+        return response.data;
     }
 
     /**
@@ -87,16 +117,25 @@ class Feeds {
      * @returns {Promise<*>}
      */
     async unsubscribe(feed_id) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid
+            }
+        }
+
         let data = {
             uid: this.user.uid,
             feed_id: feed_id
         }
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/feeds/unsubscribe', 'post', params, null, data, this.user, false);
-        return response;
+
+        let response = await axios.post('https://prod-android.whisper.sh/feeds/unsubscribe', data, config);
+
+        return response.data;
     }
 
     /**
@@ -105,16 +144,32 @@ class Feeds {
      * @returns {Promise<*>}
      */
     async whispers(feed_id) {
-        let params = {
-            feed_id: feed_id,
-            uid: this.user.uid,
-            locale: 'en_us',
-            sme: false,
-            type: 'tribe'
-        };
-        let response = await apiClient('android', '/feeds/whispers', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken
+            },
+            params: {
+                feed_id: feed_id,
+                uid: this.user.uid,
+                sme: false,
+                type: 'tribe'
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/feeds/whispers', config);
+
+        return response.data;
     }
+
+    // TODO: Add add
+    // TODO: Add anonymous_invite
+    // TODO: Add create
+    // TODO: Add flag
+    // TODO: Add invitation
+    // TODO: Add invite_by_whisper
+    // TODO: Add remove
+    // TODO: Add request_notification
 }
 
 module.exports = {
