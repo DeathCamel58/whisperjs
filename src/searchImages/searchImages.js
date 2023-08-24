@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class SearchImages {
     constructor(user) {
@@ -11,14 +11,22 @@ class SearchImages {
      * @returns {Promise<*>}
      */
     async suggest(query) {
-        let params = {
-            type: 'tribe',
-            uid: this.user.uid,
-            locale: 'en_us',
-            query: query
-        };
-        let response = await apiClient('android', '/search_images/suggest/', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'x-www-form-urlencoded'
+            },
+            params: {
+                type: 'tribe',
+                uid: this.user.uid,
+                query: query
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/search_images/suggest/', config);
+
+        return response.data;
     }
 }
 
