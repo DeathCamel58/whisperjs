@@ -1,4 +1,4 @@
-const {apiClient} = require("../util/apiClient");
+const axios = require("axios");
 
 class Whispers {
     constructor(user) {
@@ -10,13 +10,21 @@ class Whispers {
      * @returns {Promise<*>}
      */
     async latest() {
-        let params = {
-            uid: this.user.uid,
-            locale: 'en_us',
-            sme: false
-        };
-        let response = await apiClient('android', '/whispers/latest', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                sme: false
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whispers/latest', config);
+
+        return response.data;
     }
 
     /**
@@ -24,14 +32,22 @@ class Whispers {
      * @returns {Promise<*>}
      */
     async me() {
-        let params = {
-            include_me2: false,
-            uid: this.user.uid,
-            type: 'top_level',
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/whispers/me', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'x-www-form-urlencoded'
+            },
+            params: {
+                include_me2: false,
+                uid: this.user.uid,
+                type: 'top_level'
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whispers/me', config);
+
+        return response.data;
     }
 
     /**
@@ -39,13 +55,21 @@ class Whispers {
      * @returns {Promise<*>}
      */
     async popular() {
-        let params = {
-            uid: this.user.uid,
-            sme: false,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/whispers/popular', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                sme: false
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whispers/popular', config);
+
+        return response.data;
     }
 
     /**
@@ -54,14 +78,22 @@ class Whispers {
      * @returns {Promise<*>}
      */
     async replies(wid) {
-        let params = {
-            uid: this.user.uid,
-            sme: false,
-            locale: 'en_us',
-            wid: wid
-        };
-        let response = await apiClient('android', '/whispers/replies', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                sme: false,
+                wid: wid
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whispers/replies', config);
+
+        return response.data;
     }
 
     /**
@@ -69,13 +101,21 @@ class Whispers {
      * @returns {Promise<*>}
      */
     async me2() {
-        let params = {
-            uid: this.user.uid,
-            sme: false,
-            locale: 'en_us'
-        };
-        let response = await apiClient('android', '/whispers/me/me2', 'get', params, null, null, this.user, false);
-        return response;
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                sme: false
+            }
+        }
+
+        let response = await axios.get('https://prod-android.whisper.sh/whispers/me/me2', config);
+
+        return response.data;
     }
 
     // NOTE: The `/whispers/viewed` URL isn't added, as my app's requests always error out
