@@ -16,6 +16,19 @@ const {Messaging} = require("./messaging/messaging");
 class WhisperClient {
     constructor() {
         this.user = new WhisperUser();
+
+        this.Whispers = new Whispers(this.user);
+        this.Whisper = new Whisper(this.user);
+        this.Stories = new Stories(this.user);
+        this.Search = new Search(this.user);
+        this.SearchImages = new SearchImages(this.user);
+        this.SearchMedia = new SearchMedia(this.user);
+        this.Feeds = new Feeds(this.user);
+        this.Featured = new Featured(this.user);
+        this.User = new User(this.user);
+        this.Share = new Share(this.user);
+        this.Messaging = new Messaging(this.user);
+        this.TigerText = new TigerText(this.user);
     }
 
     async newUser() {
@@ -30,50 +43,6 @@ class WhisperClient {
 
     async login(uid) {
         await this.user.signIn(uid);
-    }
-
-    get Whispers() {
-        return new Whispers(this.user);
-    }
-
-    get Whisper() {
-        return new Whisper(this.user);
-    }
-
-    get Stories() {
-        return new Stories(this.user);
-    }
-
-    get Search() {
-        return new Search(this.user);
-    }
-
-    get SearchImages() {
-        return new SearchImages(this.user);
-    }
-
-    get SearchMedia() {
-        return new SearchMedia(this.user);
-    }
-
-    get Feeds() {
-        return new Feeds(this.user);
-    }
-
-    get Featured() {
-        return new Featured(this.user);
-    }
-
-    get User() {
-        return new User(this.user);
-    }
-
-    get Share() {
-        return new Share(this.user);
-    }
-
-    get Messaging() {
-        return new Messaging(this.user);
     }
 }
 
