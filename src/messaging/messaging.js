@@ -33,7 +33,7 @@ class Messaging {
     }
 
     /**
-     Gets conversation information by a group
+     * Gets conversation information by a group
      * @param group_token The group_id to get
      * @returns {Promise<*>}
      */
@@ -117,6 +117,37 @@ class Messaging {
     }
 
     /**
+     * Rates a conversation
+     * @param conversation_id The conversation ID to rate
+     * @param rating The rating to give
+     * @returns {Promise<*>}
+     */
+    async conversationRate(conversation_id, rating) {
+        let config = {
+            headers: {
+                Publisher_version: 'android_9.68.0',
+                Session_token: this.user.sessionToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+                uid: this.user.uid,
+                conversation_id: conversation_id,
+                rating: rating
+            }
+        }
+
+        let data = {
+            uid: this.user.uid,
+            conversation_id: conversation_id,
+            rating: rating
+        }
+
+        let response = await axios.post(`https://prod-android.whisper.sh/messaging/rate`, data, config);
+
+        return response.data;
+    }
+
+    /**
      * Gets the recommended Whispers
      * @returns {Promise<*>}
      */
@@ -142,7 +173,6 @@ class Messaging {
     // TODO: Add conversations/accept
     // TODO: Add conversations/delete/
     // TODO: Add conversations/tt_auth
-    // TODO: Add rate
 }
 
 module.exports = {
