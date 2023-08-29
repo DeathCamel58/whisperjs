@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const base32 = require('base32');
-const fs = require("fs");
 
 const salt = "wttMSbTVPozTne8wLzWoqdRuRRbdlf0o6j5b0+BCLKn2mH1Q5INw48n3bgibG1sV";
 

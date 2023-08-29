@@ -159,8 +159,7 @@ class WhisperUser {
         console.log(`Got session token:\n\tSession Token\t${this.sessionToken}`);
 
 
-        // Compute and send `auth_token`, get `nonce`
-        nonce = Crypto.generateNonce();
+        // Send the verify request
         config = {
             headers: {
                 Publisher_version: 'android_9.68.0',
@@ -275,11 +274,11 @@ class WhisperUser {
         let config = {
             headers: {
                 Publisher_version: 'android_9.68.0',
-                Session_token: this.user.sessionToken,
+                Session_token: this.sessionToken,
                 'Content-Type': 'application/json'
             },
             params: {
-                uid: this.user.uid
+                uid: this.uid
             }
         }
 
